@@ -11,7 +11,7 @@ import time
 driver_path = "/opt/brave.com/chromedriver"
 browser_path = "/opt/brave.com/brave/brave"
 
-meetings_uri = "http://url8366.eventpt.com/ls/click?upn=UOxl2ZR7g7Zo4e65Le9g9RLAMsRI7J6RGu2VI4ckmQMilEDFUmhNUPXM2auBzAn1YkwkW8vrAku9I3skbUkA6BhxRshiScFfj5Ijjsd-2B7cbz1Q5-2FA-2BZUAYoibCH2kyspyjgZcKdZpOeM88ghIcVf60-2BP-2F2FN-2BP2icieGJXad0vUya2Uw6cSLWUGP9xhtWoBaYklLR6ipxG3EiBbA4sV8Ow-3D-3DAEvZ_uAGIKxVHnzoGVmPcnUwHmUO3oyuWp5ypUQ6ICqQVxqVqo9QU4UjR3jYEWbT4wJ87mZCZ-2FxPTch-2BJA45J3WCtvzENa-2Bvm-2Bx185uzabmgRtQqG1dw78QFm3SeoL3ttvvcO-2FhiC8i2eu1xulXoExImbMIis9wGsy5pJ-2BDUWrXOgeyGxuH4U6XUOmLmxYSpbf-2BVM0KJU4aOE5A8fQkC5HQQ9Ym5QH8JE8-2FRce48fdXYb9PQ-3D"
+meetings_uri = "http://url8366.eventpt.com/ls/click"
 
 header = ['org', 'url', 'description', 'type', 'stage', 'headcount', 'participants']
 
