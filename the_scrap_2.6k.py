@@ -11,15 +11,11 @@ import time
 driver_path = "/opt/brave.com/chromedriver"
 browser_path = "/opt/brave.com/brave/brave"
 
-meetings_uri = ""
+meetings_uri = "http://url8366.eventpt.com/ls/click?upn=UOxl2ZR7g7Zo4e65Le9g9RLAMsRI7J6RGu2VI4ckmQMilEDFUmhNUPXM2auBzAn1YkwkW8vrAku9I3skbUkA6BhxRshiScFfj5Ijjsd-2B7cbz1Q5-2FA-2BZUAYoibCH2kyspyjgZcKdZpOeM88ghIcVf60-2BP-2F2FN-2BP2icieGJXad0vUya2Uw6cSLWUGP9xhtWoBaYklLR6ipxG3EiBbA4sV8Ow-3D-3DAEvZ_uAGIKxVHnzoGVmPcnUwHmUO3oyuWp5ypUQ6ICqQVxqVqo9QU4UjR3jYEWbT4wJ87mZCZ-2FxPTch-2BJA45J3WCtvzENa-2Bvm-2Bx185uzabmgRtQqG1dw78QFm3SeoL3ttvvcO-2FhiC8i2eu1xulXoExImbMIis9wGsy5pJ-2BDUWrXOgeyGxuH4U6XUOmLmxYSpbf-2BVM0KJU4aOE5A8fQkC5HQQ9Ym5QH8JE8-2FRce48fdXYb9PQ-3D"
 
 header = ['org', 'url', 'description', 'type', 'stage', 'headcount', 'participants']
+
 participant_header = ['id', 'name', 'linkedin', 'job title', 'market', 'sectors', 'functions']
-
-#selection_selectionFilters_savedList_item
-lists = ['P1 - Innovation Execs Buyer AI & Chatbot', 'P2 - Innovation Execs Buyer - Third Party', 'P3 - Innovation Execs Buyer - RC & Cybersecurity', 'P4 - Innovation Execs Buyer - Analytics']
-lists = ['P2 - Innovation Execs Buyer - Third Party', 'P4 - Innovation Execs Buyer - Analytics']
-
 
 def org_info(i, driver):
     return driver.find_element(By.XPATH, '//div[@data-index="'+str(i)+'"]')
@@ -51,12 +47,10 @@ def scrap_organization(org, driver, i, writer_participants):
     button = org.find_element(By.XPATH, '//div[@data-index="'+str(i)+'"]//button[@class="btn smooth btn--md btn--primary"]')
     driver.execute_script("arguments[0].scrollIntoView();", button)
     button.click()
-    pnumber = 0
     try:
         # Linked in button
         buttons = org.find_elements(By.XPATH, "//div[@class='selection_card_participantDetails']//button[@class='btn smooth btn--md btn--link']")
         for b in buttons:
-            pnumber += 1
             row_parts = ['-', '-', '-','-', '-', '-', '-']
             row_parts[0] = i
 
@@ -85,7 +79,7 @@ def scrap_organization(org, driver, i, writer_participants):
                 if "Function" in label.text:
                     row_parts[6] = value.text
                     
-            #print(*row_parts)
+            print(*row_parts)
             writer_participants.writerow(row_parts)
 
             closebutton = org.find_element(By.XPATH, '//button[@class="slider_close btn smooth btn--md btn--iconOnly"]')
@@ -100,30 +94,7 @@ def scrap_organization(org, driver, i, writer_participants):
     button.click()
     time.sleep(0.5)
     #print(row)
-    return (row, pnumber)
-
-def scrap_in_csv(driver, orgcsvname, pcsvname, count):
-    virtuoso_scroller = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[data-test-id="virtuoso-scroller"]')))
-    i = 0
-    pnumber = 0
-    with open(orgcsvname, 'w', newline='') as csvfile, open(pcsvname, 'w', newline='') as csvparts:
-        writer = csv.writer(csvfile)
-        writer_participants = csv.writer(csvparts)
-        writer_participants.writerow(participant_header)
-        writer.writerow(header)
-        while True:
-            try:
-                org = org_info(i, driver)
-                row, pnum = scrap_organization(org, driver, i, writer_participants)
-                pnumber += pnum
-                writer.writerow(row)
-                print("{:3} / {:3}: {}".format(pnumber, count, row[0]))
-                i += 1
-                if pnumber >= count:
-                    return
-            except NoSuchElementException:
-                pass
-            driver.execute_script("arguments[0].scrollTop += 100;", virtuoso_scroller)
+    return (row)
 
 def the_scrap():
     service = Service(driver_path)
@@ -134,41 +105,33 @@ def the_scrap():
 
     driver.get(meetings_uri)
 
-    # Button update for meetings
+    # Find the button element and click it
     button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'btn--link') and contains(text(), 'Update')]")))
     button.click()
 
-    # Button close pop-up
     button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'topNote_toggle')]")))
     button.click()
 
-    while len(lists) > 0:
-        try:
-            # Show more lists
-            button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@class='selection_selectionFilters_savedList_body']//div[@class='link']")))
-            button.click()
-        except Exception:
-            pass
-        l = driver.find_elements(By.XPATH, './/div[@class="selection_selectionFilters_savedList_item"]')
-        for li in l:
-            text = li.text
-            if text in lists:
-                li.click()
-                time.sleep(5)
-                count = driver.find_element(By.XPATH, './/div[@class="selection_resultCount"]//p//span//span')
-                scrap_in_csv(driver, 'orgs' + text.split()[0] + '.csv', 'participants' + text.split()[0] + '.csv', int(count.text))
-                lists.pop(lists.index(text))
-                virtuoso_scroller = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[data-test-id="virtuoso-scroller"]')))
-                while True:
-                    try:
-                        org = org_info(0, driver)
-                        break
-                    except NoSuchElementException:
-                        pass
-                    driver.execute_script("arguments[0].scrollTop -= 100;", virtuoso_scroller)
-                break
+    virtuoso_scroller = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[data-test-id="virtuoso-scroller"]')))
+    i = 0
+    with open('orgs.csv', 'w', newline='') as csvfile, open('participants.csv', 'w', newline='') as csvparts:
+        writer = csv.writer(csvfile)
+        writer_participants = csv.writer(csvparts)
+        writer_participants.writerow(participant_header)
+        writer.writerow(header)
+        while True:
+            try:
+                org = org_info(i, driver)
+                row = scrap_organization(org, driver, i, writer_participants)
+                writer.writerow(row)
+                #print(i, *row)
+                i += 1
+            except NoSuchElementException:
+                pass
+            driver.execute_script("arguments[0].scrollTop += 100;", virtuoso_scroller)    
     
     # Close the webdriver
+    time.sleep(200)
     driver.quit()
 
 
