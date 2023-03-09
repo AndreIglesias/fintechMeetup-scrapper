@@ -2,7 +2,7 @@
 
 ## Choose your broswer
 
-The only thing it is neccesary to modify in order to use the script are the 2 variables at the top of the script:
+The only neccesary thing to modify in order to use the script are the 2 variables at the top of the script:
 ```
 driver_path = "/opt/brave.com/chromedriver"
 browser_path = "/opt/brave.com/brave/brave"
